@@ -1,0 +1,252 @@
+---
+import AutomatedReviewPanel from '../components/AutomatedReviewPanel.astro';
+import Icon from '../components/Icon.astro';
+import TrackCard from '../components/TrackCard.astro';
+import TrackMap from '../components/TrackMap.astro';
+import { ACTIVITY_TYPES, DIFFICULTY_LEVELS, getSiteBaseUrl, SITE_CONFIG, withBase } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadAllTracks } from '../lib/tracks-loader';
+
+const allTracks = await loadAllTracks();
+const featuredTrack = allTracks[0];
+const baseUrl = getSiteBaseUrl(Astro.site);
+
+const homeJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_CONFIG.name,
+  url: `${baseUrl}/`,
+  description: SITE_CONFIG.heroSubheadline,
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: allTracks.map((item, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: item.entry.data.title,
+      url: `${baseUrl}/tracks/${item.slug}/`,
+    })),
+  },
+};
+---
+
+<BaseLayout jsonLd={homeJsonLd}>
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-intro">
+        <div>
+          <div class="section-eyebrow">
+            <Icon name="compass" size={15} />
+            <span>Trail Maps &amp; Route Reviews</span>
+          </div>
+          <h1 class="hero-title">{SITE_CONFIG.heroHeadline}</h1>
+          <p class="hero-lead">{SITE_CONFIG.heroSubheadline}</p>
+        </div>
+
+        <div class="hero-cta-cluster">
+          <span class="badge badge-accent">Share Your Route</span>
+          <p class="section-subtitle">
+            Upload a GPS track file from your watch or phone to see the route on the map,
+            check the steepest climbs, and write your own trail review.
+          </p>
+          <div class="hero-cta-buttons">
+            <a href={withBase('/upload/')} class="btn btn-primary btn-lg">
+              <Icon name="upload" size={18} />
+              <span>{SITE_CONFIG.primaryCtaLabel}</span>
+              <Icon name="arrow-right" size={16} class="icon-nudge" />
+            </a>
+            <a href={withBase('/#dispatches')} class="btn btn-secondary btn-lg">
+              <span>{SITE_CONFIG.secondaryCtaLabel}</span>
+            </a>
+          </div>
+          <span class="hero-cta-note">
+            Free to use · Private &amp; instant · Detailed trail map and climb breakdown
+          </span>
+        </div>
+      </div>
+
+      {featuredTrack && (
+        <div class="dual-review-layout">
+          <TrackMap
+            gpx={featuredTrack.gpx}
+            title={`Featured Dispatch: ${featuredTrack.entry.data.title}`}
+            cockpitId="hero-cockpit"
+          />
+          <AutomatedReviewPanel gpx={featuredTrack.gpx} panelId="hero-auto-review" />
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section-block" id="dispatches">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">
+            <Icon name="mountain" size={15} />
+            <span>Published Route Reviews</span>
+          </div>
+          <h2 class="section-title">Field-Tested GPX Track Dispatches</h2>
+          <p class="section-subtitle">
+            Every post pairs an automated GPX gradient &amp; crux analysis with our written field review.
+          </p>
+        </div>
+
+        <div class="filter-bar" role="group" aria-label="Filter tracks by activity">
+          <button type="button" class="filter-chip" data-filter-chip="all" aria-pressed="true">
+            All Tracks ({allTracks.length})
+          </button>
+          {ACTIVITY_TYPES.map((act) => (
+            <button type="button" class="filter-chip" data-filter-chip={act} aria-pressed="false">
+              {act}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="cockpit-topbar feed-toolbar">
+        <div class="cockpit-controls">
+          <input
+            type="search"
+            id="feed-search-input"
+            class="form-input feed-control-input"
+            placeholder="Search trail or region…"
+            aria-label="Search tracks by name or location"
+          />
+          <select
+            id="feed-difficulty-select"
+            class="form-select feed-control-select"
+            aria-label="Filter by difficulty"
+          >
+            <option value="all">All Difficulties</option>
+            {DIFFICULTY_LEVELS.map((diff) => (
+              <option value={diff}>{diff}</option>
+            ))}
+          </select>
+        </div>
+
+        <div class="cockpit-controls">
+          <label for="feed-sort-select" class="stat-subtext">Sort:</label>
+          <select
+            id="feed-sort-select"
+            class="form-select feed-control-select"
+            aria-label="Sort tracks"
+          >
+            <option value="newest">Featured &amp; Newest</option>
+            <option value="rating">Highest Rated</option>
+            <option value="gain">Most Elevation Gain</option>
+            <option value="distance">Longest Distance</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tracks-grid" id="tracks-feed-grid">
+        {allTracks.map((item) => <TrackCard item={item} />)}
+      </div>
+
+      <p class="auto-verdict-callout feed-empty-state" id="feed-empty-state" data-visible="false">
+        No GPX track reviews match your current search and filter selection.
+      </p>
+    </div>
+  </section>
+
+  <script>
+    import {
+      createSavedReviewCard,
+      deleteSavedReview,
+      getSavedReviews,
+    } from '../lib/custom-reviews';
+    import { applyUnitSystem, getActiveUnit } from '../lib/units';
+
+    const feedGrid = document.getElementById('tracks-feed-grid');
+    const searchInput = document.getElementById('feed-search-input') as HTMLInputElement | null;
+    const diffSelect = document.getElementById('feed-difficulty-select') as HTMLSelectElement | null;
+    const sortSelect = document.getElementById('feed-sort-select') as HTMLSelectElement | null;
+    const emptyState = document.getElementById('feed-empty-state');
+    const allChip = document.querySelector<HTMLButtonElement>('[data-filter-chip="all"]');
+    const chips = document.querySelectorAll<HTMLButtonElement>('[data-filter-chip]');
+    let selectedActivity = 'all';
+
+    function updateAllTracksCount() {
+      if (allChip) {
+        allChip.textContent = `All Tracks (${document.querySelectorAll('[data-track-card]').length})`;
+      }
+    }
+
+    function applyFeedFiltersAndSort() {
+      if (!feedGrid) return;
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      const diff = diffSelect?.value || 'all';
+      const sortBy = sortSelect?.value || 'newest';
+
+      const cards = Array.from(feedGrid.querySelectorAll<HTMLElement>('[data-track-card]'));
+      let visibleCount = 0;
+
+      for (const card of cards) {
+        const actMatch = selectedActivity === 'all' || card.dataset.activity === selectedActivity;
+        const diffMatch = diff === 'all' || card.dataset.difficulty === diff;
+        const textMatch =
+          !query ||
+          (card.dataset.title || '').includes(query) ||
+          (card.dataset.location || '').includes(query) ||
+          (card.dataset.activity || '').toLowerCase().includes(query);
+        const visible = actMatch && diffMatch && textMatch;
+        card.dataset.hidden = String(!visible);
+        if (visible) visibleCount++;
+      }
+
+      cards.sort((a, b) => {
+        if (sortBy === 'rating') {
+          return Number(b.dataset.rating || 0) - Number(a.dataset.rating || 0);
+        }
+        if (sortBy === 'gain') {
+          return Number(b.dataset.gain || 0) - Number(a.dataset.gain || 0);
+        }
+        if (sortBy === 'distance') {
+          return Number(b.dataset.distance || 0) - Number(a.dataset.distance || 0);
+        }
+        return String(b.dataset.date || '').localeCompare(String(a.dataset.date || ''));
+      });
+
+      for (const card of cards) {
+        feedGrid.appendChild(card);
+      }
+
+      if (emptyState) {
+        emptyState.dataset.visible = String(visibleCount === 0);
+      }
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        selectedActivity = chip.dataset.filterChip || 'all';
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        applyFeedFiltersAndSort();
+      });
+    });
+
+    searchInput?.addEventListener('input', applyFeedFiltersAndSort);
+    diffSelect?.addEventListener('change', applyFeedFiltersAndSort);
+    sortSelect?.addEventListener('change', applyFeedFiltersAndSort);
+
+    // Render any browser-saved custom GPX reviews from localStorage
+    const savedList = getSavedReviews();
+    if (feedGrid && savedList.length > 0) {
+      for (const item of savedList) {
+        feedGrid.prepend(createSavedReviewCard(item));
+      }
+      updateAllTracksCount();
+      applyUnitSystem(getActiveUnit());
+    }
+
+    feedGrid?.addEventListener('click', (e) => {
+      const target = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-delete-review]');
+      if (!target) return;
+      const id = target.dataset.deleteReview;
+      if (!id) return;
+      deleteSavedReview(id);
+      target.closest('[data-track-card]')?.remove();
+      updateAllTracksCount();
+      applyFeedFiltersAndSort();
+    });
+  </script>
+</BaseLayout>

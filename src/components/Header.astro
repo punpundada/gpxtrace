@@ -1,0 +1,62 @@
+---
+import { SITE_CONFIG, withBase } from '../config/site';
+import Icon from './Icon.astro';
+
+const currentPath = Astro.url.pathname;
+const homeHref = withBase('/');
+const uploadHref = withBase('/upload/');
+const isHome = currentPath === homeHref || currentPath === homeHref.replace(/\/$/, '');
+---
+
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href={homeHref} class="brand-link">
+      <span class="brand-mark">
+        <Icon name="compass" size={18} />
+      </span>
+      <span>{SITE_CONFIG.name}</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary">
+      <a href={homeHref} class="nav-link" aria-current={isHome ? 'page' : undefined}>
+        Track Reviews
+      </a>
+      <a href={withBase('/#dispatches')} class="nav-link">
+        Field Dispatches
+      </a>
+      <a
+        href={uploadHref}
+        class="nav-link"
+        aria-current={currentPath.startsWith(withBase('/upload')) ? 'page' : undefined}
+      >
+        GPX Review Studio
+      </a>
+    </nav>
+
+    <div class="nav-actions">
+      <div class="unit-toggle" role="group" aria-label="Unit system">
+        <button
+          type="button"
+          class="unit-toggle-btn"
+          data-unit-toggle="metric"
+          aria-pressed="true"
+        >
+          KM / M
+        </button>
+        <button
+          type="button"
+          class="unit-toggle-btn"
+          data-unit-toggle="imperial"
+          aria-pressed="false"
+        >
+          MI / FT
+        </button>
+      </div>
+
+      <a href={uploadHref} class="btn btn-primary">
+        <Icon name="upload" size={16} />
+        <span>{SITE_CONFIG.primaryCtaLabel}</span>
+      </a>
+    </div>
+  </div>
+</header>

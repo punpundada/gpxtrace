@@ -1,0 +1,239 @@
+---
+import { render } from 'astro:content';
+import AutomatedReviewPanel from '../../components/AutomatedReviewPanel.astro';
+import Icon from '../../components/Icon.astro';
+import TrackCard from '../../components/TrackCard.astro';
+import TrackMap from '../../components/TrackMap.astro';
+import { getSiteBaseUrl, SITE_CONFIG, withBase } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadAllTracks, type LoadedTrackEntry } from '../../lib/tracks-loader';
+
+export async function getStaticPaths() {
+  const allTracks = await loadAllTracks();
+  return allTracks.map((item) => ({
+    params: { slug: item.slug },
+    props: {
+      item,
+      relatedTracks: allTracks.filter((t) => t.slug !== item.slug),
+    },
+  }));
+}
+
+export interface Props {
+  item: LoadedTrackEntry;
+  relatedTracks: LoadedTrackEntry[];
+}
+
+const { item, relatedTracks } = Astro.props;
+const { entry, gpx, slug } = item;
+const { data } = entry;
+const { Content } = await render(entry);
+const baseUrl = getSiteBaseUrl(Astro.site);
+const trackUrl = `${baseUrl}/tracks/${slug}/`;
+
+const trackJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: data.title,
+    description: data.summary,
+    datePublished: data.date,
+    articleSection: data.activity,
+    url: trackUrl,
+    about: {
+      '@type': 'Place',
+      name: data.location,
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: gpx.startCoord[0],
+        longitude: gpx.startCoord[1],
+        elevation: gpx.maxElevationM,
+      },
+    },
+    review: {
+      '@type': 'Review',
+      reviewBody: data.summary,
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: data.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: SITE_CONFIG.name,
+        item: `${baseUrl}/`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: data.title,
+        item: trackUrl,
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={`${data.title} — ${SITE_CONFIG.name} Review`}
+  description={data.summary}
+  ogType="article"
+  publishedDate={data.date}
+  category={data.activity}
+  jsonLd={trackJsonLd}
+>
+  <article class="section-block-tight">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">
+            <Icon name="map-pin" size={15} />
+            <span>{data.location} · {data.activity}</span>
+          </div>
+          <h1 class="hero-title">{data.title}</h1>
+          <p class="hero-lead">{data.subtitle}</p>
+        </div>
+
+        <div class="cockpit-controls">
+          <span class="badge badge-rating tabular">
+            <Icon name="star" size={14} />
+            <span>{data.rating.toFixed(1)} / 5.0 Author Rating</span>
+          </span>
+          <span class="badge badge-accent">{data.difficulty}</span>
+          <time class="badge font-mono tabular" datetime={data.date}>{data.date}</time>
+        </div>
+      </div>
+
+      <div class="dual-review-layout">
+        <TrackMap gpx={gpx} title={data.title} cockpitId="detail-cockpit" />
+
+        <AutomatedReviewPanel gpx={gpx} panelId="detail-auto-review" />
+
+        <div class="editorial-grid">
+          <div class="prose-article">
+            <div class="section-eyebrow">
+              <Icon name="compass" size={15} />
+              <span>Written Trail Review &amp; Field Notes</span>
+            </div>
+            <div class="prose-content">
+              <Content />
+            </div>
+          </div>
+
+          <aside class="verdict-sidebar" aria-label="Track Verdict and GPX Download">
+            <div>
+              <div class="section-eyebrow">
+                <Icon name="check" size={15} />
+                <span>Field Summary</span>
+              </div>
+              <h2 class="section-title">Author Verdict &amp; Gear</h2>
+            </div>
+
+            <ul class="verdict-list">
+              <li class="verdict-item">
+                <span class="verdict-item-label">Author Rating</span>
+                <span class="verdict-item-value tabular">★ {data.rating.toFixed(1)} / 5.0</span>
+              </li>
+              <li class="verdict-item">
+                <span class="verdict-item-label">Auto Effort Score</span>
+                <span class="verdict-item-value tabular">{gpx.effortScore} / 100 ({gpx.effortCategory})</span>
+              </li>
+              <li class="verdict-item">
+                <span class="verdict-item-label">Surface</span>
+                <span class="verdict-item-value">{data.surface}</span>
+              </li>
+              <li class="verdict-item">
+                <span class="verdict-item-label">Best Window</span>
+                <span class="verdict-item-value">{data.bestSeason}</span>
+              </li>
+              <li class="verdict-item">
+                <span class="verdict-item-label">Water Points</span>
+                <span class="verdict-item-value">{data.waterNotes}</span>
+              </li>
+              <li class="verdict-item">
+                <span class="verdict-item-label">Recommended Gear</span>
+                <span class="verdict-item-value">{data.gearCallout}</span>
+              </li>
+              <li class="verdict-item">
+                <span class="verdict-item-label">GPX File</span>
+                <span class="verdict-item-value font-mono">{data.gpxFile}</span>
+              </li>
+            </ul>
+
+            <a
+              href={withBase(`/gpx/${data.gpxFile}`)}
+              download={data.gpxFile}
+              class="btn btn-primary btn-lg"
+            >
+              <Icon name="download" size={18} />
+              <span>Download Exact .GPX File</span>
+            </a>
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="copy-summary-btn"
+              data-share-summary={`${data.title} — ${gpx.totalDistanceKm.toFixed(2)} km · +${gpx.elevationGainM}m climb · Effort ${gpx.effortScore}/100`}
+            >
+              <Icon name="check" size={16} />
+              <span id="copy-summary-label">Copy Route Summary &amp; Link</span>
+            </button>
+
+            <a href={withBase('/upload/')} class="btn btn-secondary">
+              <Icon name="upload" size={16} />
+              <span>Upload &amp; Review Another GPX</span>
+            </a>
+          </aside>
+        </div>
+
+        {relatedTracks.length > 0 && (
+          <section aria-label="More Track Dispatches">
+            <div class="section-header">
+              <div>
+                <div class="section-eyebrow">
+                  <Icon name="mountain" size={15} />
+                  <span>Continue Exploring</span>
+                </div>
+                <h2 class="section-title">More Field-Tested GPX Dispatches</h2>
+              </div>
+              <a href={withBase('/#dispatches')} class="btn btn-secondary">
+                <span>View All Dispatches</span>
+              </a>
+            </div>
+            <div class="tracks-grid">
+              {relatedTracks.map((rel) => (
+                <TrackCard item={rel} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  </article>
+
+  <script>
+    const copyBtn = document.getElementById('copy-summary-btn');
+    const copyLabel = document.getElementById('copy-summary-label');
+    copyBtn?.addEventListener('click', async () => {
+      const summary = copyBtn.dataset.shareSummary || '';
+      const text = `${summary}\n${window.location.href}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        if (copyLabel) copyLabel.textContent = 'Copied Summary & Link!';
+        window.setTimeout(() => {
+          if (copyLabel) copyLabel.textContent = 'Copy Route Summary & Link';
+        }, 2400);
+      } catch {
+        // Ignore clipboard permission errors
+      }
+    });
+  </script>
+</BaseLayout>

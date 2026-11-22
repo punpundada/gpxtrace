@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="GPXTrace" xmlns="http://www.topografix.com/GPX/1/1">
+  <wpt lat="32.2557" lon="76.3331"><ele>2275</ele><name>Magic View Cafe &amp; Water Refill</name><desc>Mid-climb spring water and tea stall</desc></wpt>
+  <wpt lat="32.2624" lon="76.3489"><ele>2745</ele><name>22-Curves Switchback Entry</name><desc>Start of the steep stone staircase crux</desc></wpt>
+  <trk>
+    <name>Triund Ridge &amp; Snowline Traverse</name>
+    <trkseg>
+      <trkpt lat="32.2498" lon="76.3238"><ele>2110</ele><time>2026-10-14T06:00:00Z</time></trkpt>
+      <trkpt lat="32.2512" lon="76.3261"><ele>2145</ele><time>2026-10-14T06:08:00Z</time></trkpt>
+      <trkpt lat="32.2528" lon="76.3284"><ele>2188</ele><time>2026-10-14T06:17:00Z</time></trkpt>
+      <trkpt lat="32.2541" lon="76.3309"><ele>2230</ele><time>2026-10-14T06:26:00Z</time></trkpt>
+      <trkpt lat="32.2557" lon="76.3331"><ele>2275</ele><time>2026-10-14T06:35:00Z</time></trkpt>
+      <trkpt lat="32.2572" lon="76.3352"><ele>2322</ele><time>2026-10-14T06:45:00Z</time></trkpt>
+      <trkpt lat="32.2584" lon="76.3374"><ele>2364</ele><time>2026-10-14T06:54:00Z</time></trkpt>
+      <trkpt lat="32.2591" lon="76.3396"><ele>2408</ele><time>2026-10-14T07:04:00Z</time></trkpt>
+      <trkpt lat="32.2582" lon="76.3418"><ele>2455</ele><time>2026-10-14T07:14:00Z</time></trkpt>
+      <trkpt lat="32.2596" lon="76.3435"><ele>2505</ele><time>2026-10-14T07:25:00Z</time></trkpt>
+      <trkpt lat="32.2587" lon="76.3452"><ele>2562</ele><time>2026-10-14T07:36:00Z</time></trkpt>
+      <trkpt lat="32.2601" lon="76.3469"><ele>2618</ele><time>2026-10-14T07:48:00Z</time></trkpt>
+      <trkpt lat="32.2593" lon="76.3484"><ele>2674</ele><time>2026-10-14T08:00:00Z</time></trkpt>
+      <trkpt lat="32.2608" lon="76.3498"><ele>2732</ele><time>2026-10-14T08:12:00Z</time></trkpt>
+      <trkpt lat="32.2601" lon="76.3514"><ele>2790</ele><time>2026-10-14T08:25:00Z</time></trkpt>
+      <trkpt lat="32.2616" lon="76.3529"><ele>2842</ele><time>2026-10-14T08:37:00Z</time></trkpt>
+      <trkpt lat="32.2629" lon="76.3547"><ele>2875</ele><time>2026-10-14T08:48:00Z</time></trkpt>
+      <trkpt lat="32.2644" lon="76.3565"><ele>2915</ele><time>2026-10-14T08:59:00Z</time></trkpt>
+      <trkpt lat="32.2661" lon="76.3586"><ele>2960</ele><time>2026-10-14T09:11:00Z</time></trkpt>
+      <trkpt lat="32.2679" lon="76.3609"><ele>3012</ele><time>2026-10-14T09:24:00Z</time></trkpt>
+      <trkpt lat="32.2698" lon="76.3631"><ele>3068</ele><time>2026-10-14T09:37:00Z</time></trkpt>
+      <trkpt lat="32.2716" lon="76.3652"><ele>3125</ele><time>2026-10-14T09:50:00Z</time></trkpt>
+      <trkpt lat="32.2735" lon="76.3676"><ele>3182</ele><time>2026-10-14T10:04:00Z</time></trkpt>
+      <trkpt lat="32.2752" lon="76.3698"><ele>3228</ele><time>2026-10-14T10:18:00Z</time></trkpt>
+      <trkpt lat="32.2768" lon="76.3719"><ele>3260</ele><time>2026-10-14T10:30:00Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

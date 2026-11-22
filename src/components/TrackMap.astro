@@ -1,0 +1,176 @@
+---
+import { MAP_CONFIG, SVG_CHART_CONFIG } from '../config/site';
+import type { GpxTrackAnalysis } from '../lib/gpx';
+import Icon from './Icon.astro';
+
+export interface Props {
+  gpx: GpxTrackAnalysis;
+  title?: string;
+  cockpitId?: string;
+}
+
+const { gpx, title = gpx.name, cockpitId = 'primary-cockpit' } = Astro.props;
+const { profileWidth, profileHeight, padTop, padBottom, padLeft, padRight } = SVG_CHART_CONFIG;
+const midY = Math.round((padTop + (profileHeight - padBottom)) / 2);
+const bottomY = profileHeight - padBottom;
+---
+
+<section
+  class="cockpit-frame"
+  id={cockpitId}
+  data-track-cockpit
+  data-gpx-payload={JSON.stringify(gpx)}
+  aria-label={`Interactive OpenStreetMap and elevation profile for ${title}`}
+>
+  <div class="cockpit-topbar">
+    <div class="cockpit-title-group">
+      <span class="badge badge-accent">
+        <Icon name="map-pin" size={14} />
+        <span>Exact GPX Trace</span>
+      </span>
+      <span class="cockpit-track-title" data-cockpit-title>{title}</span>
+      <span class="badge font-mono tabular" data-cockpit-filename>{gpx.filename}</span>
+    </div>
+
+    <div class="cockpit-controls">
+      <div class="layer-switcher" role="group" aria-label="Map tile style">
+        <button
+          type="button"
+          class="layer-btn"
+          data-layer-btn={MAP_CONFIG.layers.osm.id}
+          aria-pressed="true"
+        >
+          {MAP_CONFIG.layers.osm.label}
+        </button>
+        <button
+          type="button"
+          class="layer-btn"
+          data-layer-btn={MAP_CONFIG.layers.topo.id}
+          aria-pressed="false"
+        >
+          {MAP_CONFIG.layers.topo.label}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-toggle-gradient
+        aria-pressed="false"
+      >
+        <span>Slope Colors</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-toggle-crux
+        aria-pressed="false"
+      >
+        <span>Highlight Crux</span>
+      </button>
+
+      <button type="button" class="btn btn-secondary" data-fit-bounds>
+        <Icon name="compass" size={15} />
+        <span>Center Track</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="map-viewport-wrap">
+    <div class="loading-overlay" data-loading-overlay data-loaded="false" role="status" aria-live="polite">
+      <div class="loading-pill">
+        <span class="spinner-dot"></span>
+        <span data-loading-text>Loading trail map…</span>
+      </div>
+    </div>
+    <div class="map-canvas" data-map-canvas></div>
+  </div>
+
+  <div class="elevation-dock">
+    <div class="elevation-dock-header">
+      <span class="elevation-label">
+        Elevation Profile (Move across the chart to see that spot on the map)
+      </span>
+      <div class="elevation-live-readout tabular">
+        <span>
+          Dist: <strong data-live-dist>{gpx.totalDistanceKm.toFixed(2)} km</strong>
+        </span>
+        <span>
+          Alt: <strong data-live-ele>{gpx.minElevationM} m</strong>
+        </span>
+        <span>
+          Grade: <strong data-live-grade>0.0%</strong>
+        </span>
+        <span class="font-mono" data-live-coord>
+          {gpx.startCoord[0].toFixed(4)}, {gpx.startCoord[1].toFixed(4)}
+        </span>
+      </div>
+    </div>
+
+    <div class="elevation-svg-wrap" data-elevation-wrap data-active="false">
+      <svg
+        class="elevation-svg"
+        viewBox={`0 0 ${profileWidth} ${profileHeight}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label="Track elevation profile chart"
+      >
+        <line
+          x1={padLeft}
+          y1={padTop}
+          x2={profileWidth - padRight}
+          y2={padTop}
+          class="ele-grid-line"
+        />
+        <line
+          x1={padLeft}
+          y1={midY}
+          x2={profileWidth - padRight}
+          y2={midY}
+          class="ele-grid-line"
+        />
+        <line
+          x1={padLeft}
+          y1={bottomY}
+          x2={profileWidth - padRight}
+          y2={bottomY}
+          class="ele-grid-line"
+        />
+
+        <path d={gpx.elevationAreaPath} class="ele-area" data-ele-area />
+        <path d={gpx.elevationLinePath} class="ele-line" data-ele-line />
+        <path d={gpx.cruxAreaPath} class="ele-crux-area" data-ele-crux-area />
+        <path d={gpx.cruxLinePath} class="ele-crux-line" data-ele-crux-line />
+
+        <line
+          x1={padLeft}
+          y1={padTop}
+          x2={padLeft}
+          y2={bottomY}
+          class="ele-cursor-line"
+          data-ele-cursor-line
+        />
+        <circle
+          cx={padLeft}
+          cy={bottomY}
+          r="5"
+          class="ele-cursor-dot"
+          data-ele-cursor-dot
+        />
+      </svg>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { mountTrackCockpit } from '../lib/map-controller';
+  import type { GpxTrackAnalysis } from '../lib/gpx';
+
+  document.querySelectorAll<HTMLElement>('[data-track-cockpit]').forEach((el) => {
+    const raw = el.dataset.gpxPayload;
+    if (raw) {
+      mountTrackCockpit(el, JSON.parse(raw) as GpxTrackAnalysis);
+    }
+  });
+</script>

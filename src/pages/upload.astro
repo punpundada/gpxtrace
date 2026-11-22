@@ -1,0 +1,135 @@
+---
+import AutomatedReviewPanel from '../components/AutomatedReviewPanel.astro';
+import Icon from '../components/Icon.astro';
+import ReviewEditorForm from '../components/ReviewEditorForm.astro';
+import TrackMap from '../components/TrackMap.astro';
+import { SVG_CHART_CONFIG } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadAllTracks } from '../lib/tracks-loader';
+
+const allTracks = await loadAllTracks();
+const starterTrack = allTracks[0];
+const { barWidth, barHeight } = SVG_CHART_CONFIG;
+---
+
+<BaseLayout
+  title="Upload & Review a Route — GPXTrace"
+  description="Upload a GPS track file to see the route on the map, check the climb profile, and write a trail review."
+>
+  <section class="section-block-tight">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">
+            <Icon name="upload" size={15} />
+            <span>Route Map &amp; Review Builder</span>
+          </div>
+          <h1 class="hero-title">
+            Upload your GPS track to map the route and write a trail review.
+          </h1>
+          <p class="hero-lead">
+            Select a track file exported from your GPS watch, cycling computer, or hiking app.
+            Your route map, elevation profile, and climb summary will appear right away so you can
+            add your trail notes.
+          </p>
+        </div>
+      </div>
+
+      <div class="dropzone-outer">
+        <label
+          for="gpx-file-input"
+          class="dropzone-inner"
+          id="gpx-dropzone"
+          data-dragover="false"
+        >
+          <span class="brand-mark">
+            <Icon name="upload" size={20} />
+          </span>
+          <h2 class="section-title">Drop your .GPX track file here, or click to browse</h2>
+          <p class="section-subtitle">
+            Works with standard GPS track files from Garmin, Strava, AllTrails, Komoot, Apple Watch,
+            and other outdoor apps.
+          </p>
+          <div class="cockpit-controls">
+            <span class="btn btn-primary">
+              <Icon name="upload" size={16} />
+              <span>Choose GPS Track File</span>
+            </span>
+            <button type="button" class="btn btn-secondary" id="load-sample-btn">
+              <Icon name="compass" size={16} />
+              <span>Try Sample Route ({starterTrack.entry.data.gpxFile})</span>
+            </button>
+          </div>
+          <input
+            type="file"
+            id="gpx-file-input"
+            accept=".gpx,application/gpx+xml,text/xml,application/xml"
+            class="hidden-input"
+          />
+        </label>
+
+        <div
+          class="upload-status-panel"
+          id="upload-status-panel"
+          data-visible="false"
+          role="status"
+          aria-live="polite"
+        >
+          <div class="elevation-dock-header">
+            <span class="loading-pill">
+              <span class="spinner-dot" id="status-spinner"></span>
+              <span id="upload-status-step">Reading GPS track file…</span>
+            </span>
+            <span class="font-mono tabular stat-subtext" id="upload-status-pct">0%</span>
+          </div>
+          <svg
+            class="grade-bar-svg"
+            viewBox={`0 0 ${barWidth} ${barHeight}`}
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <rect
+              x="0"
+              y="0"
+              width="0"
+              height={barHeight}
+              class="grade-rect-steep"
+              id="upload-progress-rect"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div class="studio-workspace" id="studio-workspace" data-visible="true">
+        <TrackMap
+          gpx={starterTrack.gpx}
+          title={starterTrack.gpx.name}
+          cockpitId="studio-cockpit"
+        />
+
+        <AutomatedReviewPanel gpx={starterTrack.gpx} panelId="studio-auto-review" />
+
+        <ReviewEditorForm starterTrack={starterTrack} />
+      </div>
+    </div>
+  </section>
+
+  <div class="feedback-toast" id="feedback-toast" data-visible="false" role="status" aria-live="polite">
+    <Icon name="check" size={16} />
+    <span id="feedback-toast-text">Review saved!</span>
+  </div>
+
+  <script
+    id="starter-raw-gpx"
+    type="application/json"
+    set:html={JSON.stringify({
+      filename: starterTrack.entry.data.gpxFile,
+      rawXml: starterTrack.rawGpxXml,
+    })}
+  />
+
+  <script>
+    import { mountUploadStudio } from '../lib/upload-studio';
+    mountUploadStudio();
+  </script>
+</BaseLayout>

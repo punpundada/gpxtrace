@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="GPXTrace" xmlns="http://www.topografix.com/GPX/1/1">
+  <wpt lat="13.1419" lon="75.2498"><ele>1282</ele><name>Ontimara Stream Crossing</name><desc>Last perennial shola stream before ridge</desc></wpt>
+  <wpt lat="13.1298" lon="75.2681"><ele>1712</ele><name>Zigzag Saddle Wind Gap</name><desc>Exposed grassland ridge saddle</desc></wpt>
+  <trk>
+    <name>Kudremukh Peak Shola &amp; Ridge Trail</name>
+    <trkseg>
+      <trkpt lat="13.1492" lon="75.2385"><ele>1180</ele><time>2026-10-02T06:15:00Z</time></trkpt>
+      <trkpt lat="13.1474" lon="75.2412"><ele>1215</ele><time>2026-10-02T06:24:00Z</time></trkpt>
+      <trkpt lat="13.1456" lon="75.2441"><ele>1248</ele><time>2026-10-02T06:33:00Z</time></trkpt>
+      <trkpt lat="13.1438" lon="75.2469"><ele>1238</ele><time>2026-10-02T06:41:00Z</time></trkpt>
+      <trkpt lat="13.1419" lon="75.2498"><ele>1282</ele><time>2026-10-02T06:51:00Z</time></trkpt>
+      <trkpt lat="13.1401" lon="75.2526"><ele>1335</ele><time>2026-10-02T07:02:00Z</time></trkpt>
+      <trkpt lat="13.1382" lon="75.2554"><ele>1392</ele><time>2026-10-02T07:14:00Z</time></trkpt>
+      <trkpt lat="13.1365" lon="75.2581"><ele>1450</ele><time>2026-10-02T07:26:00Z</time></trkpt>
+      <trkpt lat="13.1348" lon="75.2608"><ele>1512</ele><time>2026-10-02T07:38:00Z</time></trkpt>
+      <trkpt lat="13.1331" lon="75.2632"><ele>1578</ele><time>2026-10-02T07:51:00Z</time></trkpt>
+      <trkpt lat="13.1318" lon="75.2655"><ele>1645</ele><time>2026-10-02T08:05:00Z</time></trkpt>
+      <trkpt lat="13.1304" lon="75.2676"><ele>1718</ele><time>2026-10-02T08:20:00Z</time></trkpt>
+      <trkpt lat="13.1292" lon="75.2695"><ele>1786</ele><time>2026-10-02T08:35:00Z</time></trkpt>
+      <trkpt lat="13.1281" lon="75.2712"><ele>1845</ele><time>2026-10-02T08:48:00Z</time></trkpt>
+      <trkpt lat="13.1272" lon="75.2728"><ele>1892</ele><time>2026-10-02T09:00:00Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

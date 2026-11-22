@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640" fill="none">
+  <g stroke="#8c8273" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer sweeping valley contours -->
+    <path d="M-40 120 C 90 60, 210 170, 340 110 C 470 50, 560 140, 680 90" stroke-width="1" stroke-opacity="0.065" />
+    <path d="M-40 165 C 100 105, 220 215, 355 150 C 485 85, 570 185, 680 135" stroke-width="1.4" stroke-opacity="0.095" />
+    <path d="M-40 212 C 110 155, 235 260, 370 195 C 495 130, 580 225, 680 180" stroke-width="1" stroke-opacity="0.065" />
+
+    <!-- Top-right summit concentric contour rings -->
+    <path d="M470 72 C 535 58, 598 92, 588 148 C 578 204, 502 222, 448 192 C 394 162, 405 86, 470 72 Z" stroke-width="1" stroke-opacity="0.06" />
+    <path d="M485 95 C 530 85, 572 108, 565 145 C 558 182, 505 195, 468 175 C 431 155, 440 105, 485 95 Z" stroke-width="1.35" stroke-opacity="0.09" />
+    <path d="M500 118 C 525 112, 548 125, 544 144 C 540 163, 512 170, 492 158 C 472 146, 475 124, 500 118 Z" stroke-width="1" stroke-opacity="0.07" />
+
+    <!-- Mid-page saddle & ridge lines -->
+    <path d="M-40 310 C 80 260, 180 370, 310 320 C 440 270, 530 370, 680 310" stroke-width="1" stroke-opacity="0.065" />
+    <path d="M-40 360 C 95 305, 195 415, 325 365 C 455 315, 545 415, 680 355" stroke-width="1.4" stroke-opacity="0.095" />
+    <path d="M-40 410 C 110 355, 210 460, 340 410 C 470 360, 560 460, 680 400" stroke-width="1" stroke-opacity="0.065" />
+
+    <!-- Bottom-left knoll concentric contour rings -->
+    <path d="M135 438 C 210 420, 282 465, 268 532 C 254 599, 165 618, 102 582 C 39 546, 60 456, 135 438 Z" stroke-width="1.35" stroke-opacity="0.09" />
+    <path d="M150 466 C 202 454, 250 484, 240 528 C 230 572, 170 585, 128 560 C 86 535, 98 478, 150 466 Z" stroke-width="1" stroke-opacity="0.065" />
+    <path d="M164 492 C 194 485, 220 502, 214 526 C 208 550, 175 556, 152 542 C 129 528, 134 499, 164 492 Z" stroke-width="1" stroke-opacity="0.07" />
+
+    <!-- Lower valley sweep -->
+    <path d="M-40 530 C 120 490, 260 610, 410 545 C 520 495, 590 575, 680 530" stroke-width="1" stroke-opacity="0.065" />
+    <path d="M-40 585 C 135 540, 275 655, 425 590 C 535 540, 600 620, 680 575" stroke-width="1.4" stroke-opacity="0.09" />
+  </g>
+</svg>

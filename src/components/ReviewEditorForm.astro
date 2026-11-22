@@ -1,0 +1,233 @@
+---
+import { ACTIVITY_TYPES, DIFFICULTY_LEVELS } from '../config/site';
+import type { LoadedTrackEntry } from '../lib/tracks-loader';
+import Icon from './Icon.astro';
+
+export interface Props {
+  starterTrack: LoadedTrackEntry;
+}
+
+const { starterTrack } = Astro.props;
+---
+
+<div class="editorial-grid">
+  <form class="prose-article" id="review-editor-form">
+    <div class="auto-review-header">
+      <div>
+        <div class="section-eyebrow">
+          <Icon name="star" size={15} />
+          <span>Written Blog Review &amp; Rating</span>
+        </div>
+        <h2 class="section-title">Write Your Trail Dispatch</h2>
+      </div>
+      <span class="badge font-mono" id="active-gpx-badge">
+        {starterTrack.gpx.filename}
+      </span>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-field form-field-full">
+        <label class="form-label" for="field-title">Specific Review Headline</label>
+        <input
+          class="form-input"
+          id="field-title"
+          name="title"
+          type="text"
+          required
+          value={starterTrack.entry.data.title}
+        />
+      </div>
+
+      <div class="form-field form-field-full">
+        <label class="form-label" for="field-subtitle">Subtitle / Hook</label>
+        <input
+          class="form-input"
+          id="field-subtitle"
+          name="subtitle"
+          type="text"
+          required
+          value={starterTrack.entry.data.subtitle}
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-location">Region / Trailhead</label>
+        <input
+          class="form-input"
+          id="field-location"
+          name="location"
+          type="text"
+          required
+          value={starterTrack.entry.data.location}
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-activity">Activity Type</label>
+        <select class="form-select" id="field-activity" name="activity">
+          {ACTIVITY_TYPES.map((act) => (
+            <option value={act} selected={act === starterTrack.entry.data.activity}>
+              {act}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-difficulty">Perceived Difficulty</label>
+        <select class="form-select" id="field-difficulty" name="difficulty">
+          {DIFFICULTY_LEVELS.map((diff) => (
+            <option value={diff} selected={diff === starterTrack.entry.data.difficulty}>
+              {diff}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-rating">Author Star Rating (1.0 – 5.0)</label>
+        <input
+          class="form-input tabular"
+          id="field-rating"
+          name="rating"
+          type="number"
+          step="0.1"
+          min="1"
+          max="5"
+          required
+          value={starterTrack.entry.data.rating}
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-surface">Surface &amp; Underfoot Notes</label>
+        <input
+          class="form-input"
+          id="field-surface"
+          name="surface"
+          type="text"
+          value={starterTrack.entry.data.surface}
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-season">Best Season</label>
+        <input
+          class="form-input"
+          id="field-season"
+          name="bestSeason"
+          type="text"
+          value={starterTrack.entry.data.bestSeason}
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-water">Water Availability</label>
+        <input
+          class="form-input"
+          id="field-water"
+          name="waterNotes"
+          type="text"
+          value={starterTrack.entry.data.waterNotes}
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="field-gear">Recommended Gear Callout</label>
+        <input
+          class="form-input"
+          id="field-gear"
+          name="gearCallout"
+          type="text"
+          value={starterTrack.entry.data.gearCallout}
+        />
+      </div>
+
+      <div class="form-field form-field-full">
+        <label class="form-label" for="field-summary">Card Summary (1–2 sentences)</label>
+        <input
+          class="form-input"
+          id="field-summary"
+          name="summary"
+          type="text"
+          required
+          value={starterTrack.entry.data.summary}
+        />
+      </div>
+
+      <div class="form-field form-field-full">
+        <label class="form-label" for="field-body">
+          Full Written Review
+        </label>
+        <textarea class="form-textarea" id="field-body" name="body" required
+>## How the Track Feels Underfoot
+
+Describe the climb pacing, switchbacks, surface grip, and key landmarks along the route.
+
+## Crux &amp; Pacing Strategy
+
+Share where the gradient bites hardest and what gear or water setup worked best.</textarea>
+      </div>
+    </div>
+
+    <div class="hero-cta-buttons">
+      <button type="submit" class="btn btn-primary btn-lg">
+        <Icon name="check" size={18} />
+        <span>Save Review</span>
+      </button>
+      <button type="button" class="btn btn-secondary btn-lg" id="export-md-btn">
+        <Icon name="download" size={18} />
+        <span>Download Review Copy</span>
+      </button>
+    </div>
+  </form>
+
+  <aside class="verdict-sidebar" aria-label="Live Written Review Preview">
+    <div>
+      <div class="section-eyebrow">
+        <Icon name="activity" size={15} />
+        <span>Live Combined Review Preview</span>
+      </div>
+      <h3 class="section-title" id="preview-title">{starterTrack.entry.data.title}</h3>
+      <p class="stat-subtext" id="preview-subtitle">{starterTrack.entry.data.subtitle}</p>
+    </div>
+
+    <ul class="verdict-list">
+      <li class="verdict-item">
+        <span class="verdict-item-label">Author Rating</span>
+        <span class="verdict-item-value tabular" id="preview-rating">
+          ★ {starterTrack.entry.data.rating.toFixed(1)} / 5.0
+        </span>
+      </li>
+      <li class="verdict-item">
+        <span class="verdict-item-label">Auto Effort Score</span>
+        <span class="verdict-item-value tabular" id="preview-effort">
+          {starterTrack.gpx.effortScore} / 100 ({starterTrack.gpx.effortCategory})
+        </span>
+      </li>
+      <li class="verdict-item">
+        <span class="verdict-item-label">Surface</span>
+        <span class="verdict-item-value" id="preview-surface">
+          {starterTrack.entry.data.surface}
+        </span>
+      </li>
+      <li class="verdict-item">
+        <span class="verdict-item-label">Water Notes</span>
+        <span class="verdict-item-value" id="preview-water">
+          {starterTrack.entry.data.waterNotes}
+        </span>
+      </li>
+      <li class="verdict-item">
+        <span class="verdict-item-label">Gear Callout</span>
+        <span class="verdict-item-value" id="preview-gear">
+          {starterTrack.entry.data.gearCallout}
+        </span>
+      </li>
+    </ul>
+
+    <div class="auto-verdict-callout" id="preview-body">
+      Drop a GPX file or edit the review fields on the left to preview your published trail
+      review in real time.
+    </div>
+  </aside>
+</div>

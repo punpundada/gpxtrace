@@ -1,0 +1,252 @@
+---
+import { SVG_CHART_CONFIG } from '../config/site';
+import { formatDuration, type GpxTrackAnalysis } from '../lib/gpx';
+import Icon from './Icon.astro';
+
+export interface Props {
+  gpx: GpxTrackAnalysis;
+  panelId?: string;
+}
+
+const { gpx, panelId = 'automated-review' } = Astro.props;
+const { gradeBreakdown, cruxSegment } = gpx;
+const { barWidth, barHeight } = SVG_CHART_CONFIG;
+---
+
+<section class="auto-review-panel" id={panelId} data-auto-review-panel>
+  <div class="auto-review-header">
+    <div>
+      <div class="section-eyebrow">
+        <Icon name="activity" size={15} />
+        <span>Route Overview &amp; Climb Breakdown</span>
+      </div>
+      <h2 class="section-title">Difficulty &amp; Elevation Summary</h2>
+    </div>
+
+    <div class="effort-score-badge tabular">
+      <span class="effort-score-number" data-auto-effort-score>{gpx.effortScore}</span>
+      <div class="effort-score-meta">
+        <span>Effort Index / 100</span>
+        <span data-auto-effort-cat>{gpx.effortCategory} Grade</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="auto-verdict-callout" data-auto-verdict>
+    {gpx.autoVerdict}
+  </p>
+
+  <div class="telemetry-grid tabular">
+    <div class="stat-card">
+      <span class="stat-label">Total Distance</span>
+      <div class="stat-value-row">
+        <span
+          class="stat-number"
+          data-auto-dist-val
+          data-unit-km={gpx.totalDistanceKm}
+          data-unit-decimals="2"
+        >
+          {gpx.totalDistanceKm.toFixed(2)}
+        </span>
+        <span class="stat-unit" data-unit-label="distance">km</span>
+      </div>
+      <span class="stat-subtext font-mono" data-auto-points>{gpx.pointCount} GPS pts</span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Elevation Gain</span>
+      <div class="stat-value-row">
+        <span
+          class="stat-number"
+          data-auto-gain-val
+          data-unit-m={gpx.elevationGainM}
+          data-unit-prefix="+"
+        >
+          +{gpx.elevationGainM}
+        </span>
+        <span class="stat-unit" data-unit-label="elevation">m</span>
+      </div>
+      <span class="stat-subtext">
+        Loss:
+        <span data-auto-loss-val data-unit-m={gpx.elevationLossM} data-unit-prefix="-">
+          -{gpx.elevationLossM}
+        </span>
+        <span data-unit-label="elevation">m</span>
+      </span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Summit / High Point</span>
+      <div class="stat-value-row">
+        <span class="stat-number" data-auto-max-ele data-unit-m={gpx.maxElevationM}>
+          {gpx.maxElevationM}
+        </span>
+        <span class="stat-unit" data-unit-label="elevation">m</span>
+      </div>
+      <span class="stat-subtext">
+        Low:
+        <span data-auto-min-ele data-unit-m={gpx.minElevationM}>{gpx.minElevationM}</span>
+        <span data-unit-label="elevation">m</span>
+      </span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Moving Time</span>
+      <div class="stat-value-row">
+        <span class="stat-number" data-auto-duration>
+          {formatDuration(gpx.movingDurationSec)}
+        </span>
+      </div>
+      <span class="stat-subtext">
+        Avg:
+        <span data-auto-speed data-unit-kmh={gpx.avgSpeedKmh}>{gpx.avgSpeedKmh.toFixed(1)}</span>
+        <span data-unit-label="speed">km/h</span>
+      </span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Crux Pitch Climb</span>
+      <div class="stat-value-row">
+        <span class="stat-number" data-auto-crux-grade>
+          {cruxSegment.avgGradePct.toFixed(1)}%
+        </span>
+      </div>
+      <span class="stat-subtext" data-auto-crux-range>
+        <span data-unit-label="distance">km</span>{' '}
+        <span data-auto-crux-start data-unit-km={cruxSegment.startKm} data-unit-decimals="1">
+          {cruxSegment.startKm.toFixed(1)}
+        </span>{' '}
+        →{' '}
+        <span data-auto-crux-end data-unit-km={cruxSegment.endKm} data-unit-decimals="1">
+          {cruxSegment.endKm.toFixed(1)}
+        </span>{' '}
+        (<span data-auto-crux-gain data-unit-m={cruxSegment.gainM} data-unit-prefix="+">+{cruxSegment.gainM}</span><span data-unit-label="elevation">m</span>)
+      </span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Peak Gradient</span>
+      <div class="stat-value-row">
+        <span class="stat-number" data-auto-max-grade>
+          {gpx.maxGradePct.toFixed(1)}%
+        </span>
+      </div>
+      <span class="stat-subtext">Max sustained slope</span>
+    </div>
+  </div>
+
+  <div class="grade-breakdown-block tabular">
+    <div class="elevation-dock-header">
+      <span class="elevation-label">Steepness &amp; Gradient Distribution</span>
+      <span class="stat-subtext">Share of total track distance by slope</span>
+    </div>
+
+    <svg
+      class="grade-bar-svg"
+      viewBox={`0 0 ${barWidth} ${barHeight}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Gradient distribution bar"
+    >
+      <rect
+        x={gradeBreakdown.flatX}
+        y="0"
+        width={gradeBreakdown.flatPct}
+        height={barHeight}
+        class="grade-rect-flat"
+        data-rect-flat
+      />
+      <rect
+        x={gradeBreakdown.rollingX}
+        y="0"
+        width={gradeBreakdown.rollingPct}
+        height={barHeight}
+        class="grade-rect-rolling"
+        data-rect-rolling
+      />
+      <rect
+        x={gradeBreakdown.steepX}
+        y="0"
+        width={gradeBreakdown.steepPct}
+        height={barHeight}
+        class="grade-rect-steep"
+        data-rect-steep
+      />
+      <rect
+        x={gradeBreakdown.extremeX}
+        y="0"
+        width={gradeBreakdown.extremePct}
+        height={barHeight}
+        class="grade-rect-extreme"
+        data-rect-extreme
+      />
+    </svg>
+
+    <div class="grade-legend-grid">
+      <div class="grade-legend-item">
+        <span class="grade-dot-label">
+          <span class="grade-dot grade-dot-flat"></span>
+          <span>Flat (&lt;3%)</span>
+        </span>
+        <strong data-pct-flat>{gradeBreakdown.flatPct}%</strong>
+      </div>
+
+      <div class="grade-legend-item">
+        <span class="grade-dot-label">
+          <span class="grade-dot grade-dot-rolling"></span>
+          <span>Rolling (3–8%)</span>
+        </span>
+        <strong data-pct-rolling>{gradeBreakdown.rollingPct}%</strong>
+      </div>
+
+      <div class="grade-legend-item">
+        <span class="grade-dot-label">
+          <span class="grade-dot grade-dot-steep"></span>
+          <span>Steep (8–15%)</span>
+        </span>
+        <strong data-pct-steep>{gradeBreakdown.steepPct}%</strong>
+      </div>
+
+      <div class="grade-legend-item">
+        <span class="grade-dot-label">
+          <span class="grade-dot grade-dot-extreme"></span>
+          <span>Extreme (&gt;15%)</span>
+        </span>
+        <strong data-pct-extreme>{gradeBreakdown.extremePct}%</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="grade-breakdown-block tabular">
+    <div class="elevation-dock-header">
+      <span class="elevation-label">Estimated Finish Time by Pace</span>
+      <span class="stat-subtext">Based on total distance and climbing</span>
+    </div>
+
+    <div class="grade-legend-grid">
+      <div class="grade-legend-item">
+        <span class="grade-dot-label">
+          <span class="grade-dot grade-dot-flat"></span>
+          <span>Casual / Social Pace</span>
+        </span>
+        <strong data-pace-casual>{formatDuration(gpx.paceEstimates.casualSec)}</strong>
+      </div>
+
+      <div class="grade-legend-item">
+        <span class="grade-dot-label">
+          <span class="grade-dot grade-dot-rolling"></span>
+          <span>Steady Trail Pace</span>
+        </span>
+        <strong data-pace-steady>{formatDuration(gpx.paceEstimates.steadySec)}</strong>
+      </div>
+
+      <div class="grade-legend-item">
+        <span class="grade-dot-label">
+          <span class="grade-dot grade-dot-steep"></span>
+          <span>Fast / Tempo Pace</span>
+        </span>
+        <strong data-pace-fast>{formatDuration(gpx.paceEstimates.fastSec)}</strong>
+      </div>
+    </div>
+  </div>
+</section>

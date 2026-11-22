@@ -1,0 +1,36 @@
+---
+import Icon from '../components/Icon.astro';
+import { SITE_CONFIG, withBase } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title={`404: Off-Trail — ${SITE_CONFIG.name}`}
+  description="The GPX route or trail dispatch you requested could not be found."
+>
+  <section class="section-block">
+    <div class="container">
+      <div class="auto-review-panel">
+        <div class="section-eyebrow">
+          <Icon name="compass" size={15} />
+          <span>404 · Waypoint Off-Route</span>
+        </div>
+        <h1 class="hero-title">Looks like this trail marker wandered off the GPX trace.</h1>
+        <p class="hero-lead">
+          The route review or page you requested does not exist at these coordinates. Head back to the
+          published track dispatches or upload a new <code class="font-mono">.gpx</code> recording.
+        </p>
+        <div class="hero-cta-buttons">
+          <a href={withBase('/')} class="btn btn-primary btn-lg">
+            <Icon name="compass" size={18} />
+            <span>Back to Track Dispatches</span>
+          </a>
+          <a href={withBase('/upload/')} class="btn btn-secondary btn-lg">
+            <Icon name="upload" size={18} />
+            <span>Upload a GPX File</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

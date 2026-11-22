@@ -1,0 +1,91 @@
+---
+import { SVG_CHART_CONFIG, withBase } from '../config/site';
+import { formatDuration } from '../lib/gpx';
+import type { LoadedTrackEntry } from '../lib/tracks-loader';
+import Icon from './Icon.astro';
+
+export interface Props {
+  item: LoadedTrackEntry;
+}
+
+const { item } = Astro.props;
+const { entry, slug, gpx } = item;
+const { data } = entry;
+const { silhouetteWidth, silhouetteHeight } = SVG_CHART_CONFIG;
+const trackHref = withBase(`/tracks/${slug}/`);
+---
+
+<article
+  class="track-card"
+  data-track-card
+  data-activity={data.activity}
+  data-difficulty={data.difficulty}
+  data-title={data.title.toLowerCase()}
+  data-location={data.location.toLowerCase()}
+  data-distance={gpx.totalDistanceKm}
+  data-gain={gpx.elevationGainM}
+  data-rating={data.rating}
+  data-date={data.date}
+>
+  <a href={trackHref} class="track-card-preview" aria-label={`Inspect ${data.title}`}>
+    <div>
+      <span class="badge badge-accent">{data.activity}</span>
+      <p class="stat-subtext font-mono tabular">{data.gpxFile}</p>
+    </div>
+
+    <svg
+      class="silhouette-svg"
+      viewBox={`0 0 ${silhouetteWidth} ${silhouetteHeight}`}
+      role="img"
+      aria-label={`Route trace for ${data.title}`}
+    >
+      <path d={gpx.silhouettePath} class="silhouette-path" />
+    </svg>
+  </a>
+
+  <div class="track-card-body">
+    <div class="track-card-meta">
+      <span class="badge">{data.difficulty} · Effort {gpx.effortScore}/100</span>
+      <span class="badge badge-rating tabular">
+        <Icon name="star" size={13} />
+        <span>{data.rating.toFixed(1)}</span>
+      </span>
+    </div>
+
+    <h3 class="track-card-title">
+      <a href={trackHref}>{data.title}</a>
+    </h3>
+
+    <p class="track-card-summary">{data.summary}</p>
+
+    <div class="track-card-stats tabular">
+      <div class="mini-stat">
+        <span class="mini-stat-label">Distance</span>
+        <span class="mini-stat-val">
+          <span data-unit-km={gpx.totalDistanceKm} data-unit-decimals="2">
+            {gpx.totalDistanceKm.toFixed(2)}
+          </span>
+          <span data-unit-label="distance">km</span>
+        </span>
+      </div>
+
+      <div class="mini-stat">
+        <span class="mini-stat-label">Climb</span>
+        <span class="mini-stat-val">
+          +<span data-unit-m={gpx.elevationGainM}>{gpx.elevationGainM}</span>
+          <span data-unit-label="elevation">m</span>
+        </span>
+      </div>
+
+      <div class="mini-stat">
+        <span class="mini-stat-label">Moving Time</span>
+        <span class="mini-stat-val">{formatDuration(gpx.movingDurationSec)}</span>
+      </div>
+    </div>
+
+    <a href={trackHref} class="btn btn-secondary">
+      <span>Read Full Track Review</span>
+      <Icon name="arrow-right" size={15} class="icon-nudge" />
+    </a>
+  </div>
+</article>
