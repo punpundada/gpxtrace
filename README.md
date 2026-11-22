@@ -1,5 +1,7 @@
 # GPXTrace
 
+**Live Site:** [https://punpundada.github.io/gpxtrace/](https://punpundada.github.io/gpxtrace/)
+
 ![GPXTrace — Field-Tested GPX Track Dispatches & Automated Telemetry Reviews](./public/og-card.svg)
 
 **GPXTrace** is a static GPS trail and cycling review blog paired with a client-side GPX telemetry studio. Built with **Astro** (`output: 'static'`) and **Leaflet**, it combines automated route diagnostics from raw `.gpx` recordings with written field notes—requiring zero backend servers or map API keys.
